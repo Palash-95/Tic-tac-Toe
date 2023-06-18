@@ -1,3 +1,7 @@
+/* eslint-disable comma-dangle */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-plusplus */
 /* eslint-disable indent */
 function gameBoard() {
     const board = [];
@@ -32,3 +36,43 @@ function cell() {
         getValue,
     };
     }
+
+function gameController(
+    playerOne = 'Player One',
+    playerTwo = 'Player Two'
+) {
+    const board = gameBoard();
+
+    const players = [
+        {
+            name: playerOne,
+            mark: 'X'
+        },
+        {
+            name: playerTwo,
+            mark: 'O'
+        }
+    ];
+
+    let activePlayer = players[0];
+
+    const switchPlayerTurn = () => {
+        activePlayer = activePlayer === players[0] ? players[1] : players[0];
+    };
+
+    const getActivePlayer = () => activePlayer;
+
+    const playRound = (index) => {
+        board.dropMark(index, getActivePlayer().mark);
+
+        //here goes the winning logic
+
+        switchPlayerTurn();
+    };
+
+    return {
+        getActivePlayer,
+        playRound,
+        getBoard: board.getBoard
+    };
+};
