@@ -75,4 +75,44 @@ function gameController(
         playRound,
         getBoard: board.getBoard
     };
-};
+}
+
+function screenController() {
+    const game = gameController();
+    const playerTurnDiv = document.querySelector('.turn');
+    const boardDiv = document.querySelector('.board');
+
+    const updateScreen = () => {
+        boardDiv.textContent = '';
+
+        const board = game.getBoard;
+        const activePlayer = game.getActivePlayer;
+
+        playerTurnDiv.textContent = `${activePlayer.name}'s turn`;
+
+        // eslint-disable-next-line no-shadow
+        board.forEach((cell, index) => {
+            const cellButton = document.createElement('button');
+            cellButton.classList.add('cell');
+            cellButton.dataset.index = index;
+            cellButton.textContent = `${cell.getValue()}`;
+            boardDiv.appendChild(cellButton);
+        });
+    };
+
+    function clickHandlerBoard(e) {
+        const selectedCell = e.target.dataset.index;
+
+        if (!selectedCell) return;
+
+        game.playRound(selectedCell);
+
+        updateScreen();
+    }
+
+    boardDiv.addEventListener('click', clickHandlerBoard);
+
+    updateScreen();
+}
+
+screenController();
