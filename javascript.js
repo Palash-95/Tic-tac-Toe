@@ -85,8 +85,8 @@ function screenController() {
     const updateScreen = () => {
         boardDiv.textContent = '';
 
-        const board = game.getBoard;
-        const activePlayer = game.getActivePlayer;
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
 
         playerTurnDiv.textContent = `${activePlayer.name}'s turn`;
 
