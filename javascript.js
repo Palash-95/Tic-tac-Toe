@@ -63,6 +63,8 @@ function gameController(
     const getActivePlayer = () => activePlayer;
 
     const playRound = (index) => {
+        if (board.getBoard()[index].getValue()) return;
+
         board.dropMark(index, getActivePlayer().mark);
 
         //here goes the winning logic

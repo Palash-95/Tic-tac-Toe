@@ -10,7 +10,20 @@
 </head>
 <body>
     <h1>Tic-Tac-Toe</h1>
-    <div class="turn"></div>
-    <div class="board"></div>
+    <div id="game-mode">
+        <button id="vsPlayer">Player Vs Player</button>
+        <button id="vsComputer">Player Vs Computer</button>
+    </div>
+    <form action="">
+        <input type="text" name="player1" id="player1" placeholder="Player one">
+        vs
+        <input type="text" name="player2" id="player2" placeholder="Player two">
+        <button type="submit">Start</button>
+    </form>
+    <div id="main-game-display">
+        <div class="turn"></div>
+        <div class="board"></div>
+    </div>
+    <div class="winner-board"></div>
 </body>
 </html>
