@@ -11,15 +11,14 @@ const playerVsPlayer = document.getElementById('vsPlayer');
 const playerVsComputer = document.getElementById('vsComputer');
 const mainGameDisplay = document.getElementById('main-game-display');
 const form = document.querySelector('form');
+let gameMode;
 
 playerVsPlayer.addEventListener('click', () => {
     gameModeDiv.style.display = 'none';
     form.style.display = 'flex';
 });
 
-
-
- const players = [
+const players = [
     {
         mark: 'X'
     },
@@ -27,6 +26,17 @@ playerVsPlayer.addEventListener('click', () => {
         mark: 'O'
     }
 ];
+let screenController1;
+
+playerVsComputer.addEventListener('click', () => {
+    gameMode = 'player vs computer';
+    players[0].name = 'You';
+    players[1].name = 'Computer';
+    gameModeDiv.style.display = 'none';
+    mainGameDisplay.style.display = 'block';
+    screenController1 = screenController();
+});
+ 
 form.addEventListener('submit', (event) => {
     event.preventDefault();
     const playerOne = document.getElementById('player1');
@@ -35,7 +45,8 @@ form.addEventListener('submit', (event) => {
     players[1].name = playerTwo.value ? playerTwo.value : playerTwo.placeholder;
     form.style.display = 'none';
     mainGameDisplay.style.display = 'block';
-    
+    screenController1 = screenController();
+    gameMode = 'player vs player';
 });
 
 const board = (() => {
@@ -95,7 +106,7 @@ function gameController() {
                 board.dropMark(i, '');
             }
             winnerDiv.style.display = 'none';
-            screenController.updateScreen();
+            screenController1.updateScreen();
         });
         
         // eslint-disable-next-line consistent-return
@@ -112,9 +123,9 @@ function gameController() {
             for (const combination of winningCombinations) {
                 const [a, b, c] = combination;
 
-                let A = board.getBoard()[a].getValue();
-                let B = board.getBoard()[b].getValue();
-                let C = board.getBoard()[c].getValue();
+                const A = board.getBoard()[a].getValue();
+                const B = board.getBoard()[b].getValue();
+                const C = board.getBoard()[c].getValue();
 
                 if (A === B && B === C && A) { 
                     winnerDiv.textContent = `${getActivePlayer().name} Wins`;
@@ -129,7 +140,7 @@ function gameController() {
         if (checkForWinner) return;
 
         const checkForDraw = (() => {
-            // eslint-disable-next-line no-restricted-syntax
+            // eslint-disable-next-line no-restricted-syntax, prefer-const
             for (let i of board.getBoard()) {
                 if (!i.getValue()) return;
             }
@@ -152,7 +163,7 @@ function gameController() {
     };
 }
 
-const screenController = (() => {
+const screenController = () => {
     const game = gameController();
     const playerTurnDiv = document.querySelector('.turn');
     const boardDiv = document.querySelector('.board');
@@ -175,13 +186,23 @@ const screenController = (() => {
         });
     };
 
+    function playComputerTurn() {
+        const buttonList = document.querySelectorAll('.cell');
+        const filteredButtonList = Array.from(buttonList).filter((button) => button.textContent === '');
+        const randomIndex = Math.floor(Math.random() * filteredButtonList.length);
+        const targetButtonIndex = filteredButtonList[randomIndex].dataset.index;
+        game.playRound(targetButtonIndex);
+    }
+
     function clickHandlerBoard(e) {
         const selectedCell = e.target.dataset.index;
 
         if (!selectedCell) return;
 
         game.playRound(selectedCell);
-
+        updateScreen();
+        
+        playComputerTurn();
         updateScreen();
     }
 
@@ -192,5 +213,4 @@ const screenController = (() => {
     return {
         updateScreen
     };
-})();
-
+};
