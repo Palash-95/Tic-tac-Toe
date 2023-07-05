@@ -94,7 +94,7 @@ function gameController() {
     const getActivePlayer = () => activePlayer;
 
     const playRound = (index) => {
-        if (board.getBoard()[index].getValue()) return;
+        if (board.getBoard()[index].getValue()) return 'already marked';
 
         board.dropMark(index, getActivePlayer().mark);
 
@@ -107,6 +107,10 @@ function gameController() {
             }
             winnerDiv.style.display = 'none';
             screenController1.updateScreen();
+            if (activePlayer.name === 'Computer') {
+                screenController1.playComputerTurn();
+                screenController1.updateScreen();
+            }
         });
         
         // eslint-disable-next-line consistent-return
@@ -128,7 +132,11 @@ function gameController() {
                 const C = board.getBoard()[c].getValue();
 
                 if (A === B && B === C && A) { 
-                    winnerDiv.textContent = `${getActivePlayer().name} Wins`;
+                    // eslint-disable-next-line no-nested-ternary
+                    winnerDiv.textContent = (gameMode === 'player vs player')
+                    ? `${getActivePlayer().name} Wins`
+                    : (getActivePlayer().name === 'Computer') 
+                        ? 'You Lost' : 'You Won';
                     winnerDiv.style.display = 'flex'; 
                     winnerDiv.appendChild(playButton);
 
@@ -137,7 +145,7 @@ function gameController() {
             }
         })();
 
-        if (checkForWinner) return;
+        if (checkForWinner) return 'game over';
 
         const checkForDraw = (() => {
             // eslint-disable-next-line no-restricted-syntax, prefer-const
@@ -151,7 +159,7 @@ function gameController() {
             return true;
         })();
 
-        if (checkForDraw) return;
+        if (checkForDraw) return 'game over';
 
         switchPlayerTurn();
     };
@@ -174,7 +182,8 @@ const screenController = () => {
         const Board = game.getBoard();
         const activePlayer = game.getActivePlayer();
 
-        playerTurnDiv.textContent = `${activePlayer.name}'s turn`;
+        playerTurnDiv.textContent = (gameMode === 'player vs computer' && activePlayer.name !== 'Computer')
+        ? 'Your turn' : `${activePlayer.name}'s turn`;
 
         // eslint-disable-next-line no-shadow
         Board.forEach((cell, index) => {
@@ -199,8 +208,11 @@ const screenController = () => {
 
         if (!selectedCell) return;
 
-        game.playRound(selectedCell);
+        const playerTurn = game.playRound(selectedCell);
+        if (playerTurn === 'already marked') return;
         updateScreen();
+
+        if (playerTurn === 'game over') return;
         
         playComputerTurn();
         updateScreen();
@@ -211,6 +223,7 @@ const screenController = () => {
     updateScreen();
 
     return {
-        updateScreen
+        updateScreen,
+        playComputerTurn
     };
 };
