@@ -1,3 +1,8 @@
+/* eslint-disable no-unreachable-loop */
+/* eslint-disable no-else-return */
+/* eslint-disable no-tabs */
+/* eslint-disable no-mixed-spaces-and-tabs */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-multiple-empty-lines */
 /* eslint-disable no-trailing-spaces */
 /* eslint-disable padded-blocks */
@@ -29,12 +34,12 @@ const players = [
 let screenController1;
 
 playerVsComputer.addEventListener('click', () => {
-    gameMode = 'player vs computer';
     players[0].name = 'You';
     players[1].name = 'Computer';
     gameModeDiv.style.display = 'none';
     mainGameDisplay.style.display = 'block';
     screenController1 = screenController();
+    gameMode = 'player vs computer';
 });
  
 form.addEventListener('submit', (event) => {
@@ -195,12 +200,82 @@ const screenController = () => {
         });
     };
 
+    function getAIMove() {
+        const Board = game.getBoard().map((cell) => cell.getValue());
+	    function evaluate(board) {
+ 	    	const winningCombinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], 
+ 	    	[0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+ 
+	    	for (const combination of winningCombinations) {
+                const pattern = combination.map((i) => board[i]);
+	    		if (pattern.every(cell => cell === 'O')) return 1;
+
+	    		else if (pattern.every(cell => cell === 'X')) return -1;
+	    	}
+	    	if (board.every(cell => cell !== '')) return 0;
+        
+	    	return null;
+        
+	    }
+
+	    function minimax(board, depth, isMaximizer) {
+	    	const score = evaluate(board);
+	    	if (score !== null) return score;
+
+	    	if (isMaximizer) {
+	    		let bestScore = -Infinity;
+	    		for (let i = 0; i < 9; i++) {
+	    			if (board[i] === '') {
+	    				board[i] = 'O';
+	    				const currentScore = minimax(board, depth + 1, false);
+	    				board[i] = '';
+	    				bestScore = Math.max(bestScore, currentScore);
+				    }
+			    }
+			    return bestScore;
+		    } else {
+                 let bestScore = Infinity;
+                 for (let i = 0; i < 9; i++) {
+				    if (board[i] === '') {
+				    	board[i] = 'X';
+				    	const currentScore = minimax(board, depth + 1, true);
+				    	board[i] = '';
+				    	bestScore = Math.min(bestScore, currentScore);
+				    }
+			     }
+			return bestScore;
+	         }
+        }
+
+        let bestScore = -Infinity;
+        let bestMOve;
+
+        for (let i = 0; i < 9; i++) {
+            if (Board[i] === '') {
+                Board[i] = 'O';
+                const currentScore = minimax(Board, 0, false);
+                Board[i] = '';
+                if (bestScore < currentScore) {
+                    bestScore = currentScore;
+                    bestMOve = i;
+                }
+            }
+        }
+        return bestMOve;
+    }
+
     function playComputerTurn() {
-        const buttonList = document.querySelectorAll('.cell');
-        const filteredButtonList = Array.from(buttonList).filter((button) => button.textContent === '');
-        const randomIndex = Math.floor(Math.random() * filteredButtonList.length);
-        const targetButtonIndex = filteredButtonList[randomIndex].dataset.index;
-        game.playRound(targetButtonIndex);
+        if (false) {
+            const buttonList = document.querySelectorAll('.cell');
+            const filteredButtonList = Array.from(buttonList).filter((button) => button.textContent === '');
+            const randomIndex = Math.floor(Math.random() * filteredButtonList.length);
+            const targetButtonIndex = filteredButtonList[randomIndex].dataset.index;
+            game.playRound(targetButtonIndex);
+        }
+        else {
+            const index = getAIMove();
+            game.playRound(index);
+        }
     }
 
     function clickHandlerBoard(e) {
@@ -213,6 +288,7 @@ const screenController = () => {
         updateScreen();
 
         if (playerTurn === 'game over') return;
+        if (gameMode === 'player vs player') return;
         
         playComputerTurn();
         updateScreen();
